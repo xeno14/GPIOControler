@@ -8,12 +8,18 @@
                 font-size: 1.2em;
                 border-style: none;
             }
+            textarea {
+                width: 300px;
+                height: 7em;
+                line-height: 1.5em;
+            }
         </style>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
         <script type="text/javascript">
             var ws = new WebSocket("ws://192.168.24.121:8000/echo");
             ws.onmessage = function(e) {
-                $("#view").html($("#view").val() + e.data + "\n");
+                var log = (new Date()).toLocaleString() + "| " +  e.data;
+                $("#view").html(log + "\n" + $("#view").val());
             };
             function send_data() {
                 ws.send($("#send_input").val());
