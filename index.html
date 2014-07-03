@@ -1,0 +1,49 @@
+<html>                                                                                                                  
+    <head>
+        <title>gevent websocket test</title>
+
+        <style type="text/css">
+            input.button1 { 
+                padding: 15px 40px;
+                font-size: 1.2em;
+                border-style: none;
+            }
+        </style>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            var ws = new WebSocket("ws://192.168.24.121:8000/echo");
+            ws.onmessage = function(e) {
+                $("#view").html($("#view").val() + e.data + "\n");
+            };
+            function send_data() {
+                ws.send($("#send_input").val());
+            };
+            function send_data(val){
+                ws.send(val);
+            };
+        </script>
+    </head>
+    <body>
+        <div>
+            <h1>Button de Input</h1>
+            <div>
+                <input type="button" value="stop" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="forward" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="back" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="cw" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="ccw" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="brake" class="button1" onClick="send_data(this.value)"><br>
+            </div>
+        </div>
+        <div>
+            <h1>Hand de Input</h1>
+            <div>
+                <input name="send_input" id="send_input" />
+                <input type="button" value="push" onclick="send_data()" />
+            </div>
+            <div>
+                <textarea id="view"></textarea>
+            </div>
+        </div>
+    </body>
+</html>
