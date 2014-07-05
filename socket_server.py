@@ -8,16 +8,22 @@ http://d.hatena.ne.jp/hekyou/20120712/p1
 
 
 import sys
+import threading
+import time
+import datetime
+import RPi.GPIO as GPIO
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
-
 from CAA import WheelControl
+from GPIOcontrol import SafetyThread
 
+# index.htmlを開く
 f = open("./index.html");
 content = f.read()
 f.close()
 
-wheel = WheelControl([7,11,13,15])
+wheel = WheelControl([7,11,13,15])  #車輪の制御プログラム
+th = SafetyThread(10)               #安全装置(10秒)    
 
 def app(environ, start_response):
     if environ["PATH_INFO"] == '/echo':
@@ -28,6 +34,7 @@ def app(environ, start_response):
                 break
             try:
                 wheel.execute(src)
+                th.update()
                 ws.send(src + "...done")
             except:
                 ws.send(src + "...failed")
@@ -38,7 +45,11 @@ def app(environ, start_response):
                 ])  
         return iter([content])
 
+
 if __name__=="__main__":
-    server = pywsgi.WSGIServer(('192.168.24.121', 8000), app, handler_class=WebSocketHandler)
+    th.register(wheel.stop)
+    th.start()  #安全装置スレッドの開始
+
+    server = pywsgi.WSGIServer(('caa.moe.hm', 8000), app, handler_class=WebSocketHandler)
     server.serve_forever()
     GPIO.cleanup()

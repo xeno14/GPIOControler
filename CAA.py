@@ -39,4 +39,5 @@ class WheelControl(GPIOcontrol):
         self._lasttime = now
         self._lastorder = order
 
-
+    def stop(self):
+        self.setByBits("0000")

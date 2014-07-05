@@ -21,7 +21,7 @@
                 var log = (new Date()).toLocaleString() + "| " +  e.data;
                 $("#view").html(log + "\n" + $("#view").val());
             };
-            function send_data() {
+            function send_view_data() {
                 ws.send($("#send_input").val());
             };
             function send_data(val){
@@ -32,12 +32,13 @@
     <body>
         <div>
             <h1>Button de Input</h1>
-            <div>
+            <div align="center">
+                <!-- this.valueをちゃんと文字列にする！ -->
                 <input type="button" value="stop" class="button1" onClick="send_data(this.value)"><br>
                 <input type="button" value="forward" class="button1" onClick="send_data(this.value)"><br>
-                <input type="button" value="back" class="button1" onClick="send_data(this.value)"><br>
-                <input type="button" value="cw" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="cw " class="button1" onClick="send_data('cw')">
                 <input type="button" value="ccw" class="button1" onClick="send_data(this.value)"><br>
+                <input type="button" value="back" class="button1" onClick="send_data(this.value)"><br>
                 <input type="button" value="brake" class="button1" onClick="send_data(this.value)"><br>
             </div>
         </div>
@@ -45,7 +46,7 @@
             <h1>Hand de Input</h1>
             <div>
                 <input name="send_input" id="send_input" />
-                <input type="button" value="push" onclick="send_data()" />
+                <input type="button" value="push" onclick="send_view_data()" />
             </div>
             <div>
                 <textarea id="view"></textarea>
