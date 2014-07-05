@@ -90,7 +90,7 @@ class SafetyThread(threading.Thread):
         while(1):
             time.sleep(self._tick)
             now = time.time()
-            print now
+            #print now
             if now - self._lasttime > self._threshold:
                 for f in self._callbacks:   #コールバックの実行
                     f()

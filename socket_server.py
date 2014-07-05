@@ -45,11 +45,16 @@ def app(environ, start_response):
                 ])  
         return iter([content])
 
-
 if __name__=="__main__":
+
+    if len(sys.argv) != 2:
+        print("usage: %s ipadress" % sys.argv[0])
+        sys.exit(1)
+    ipadress = sys.argv[1]
+
     th.register(wheel.stop)
     th.start()  #安全装置スレッドの開始
 
-    server = pywsgi.WSGIServer(('caa.moe.hm', 8000), app, handler_class=WebSocketHandler)
+    server = pywsgi.WSGIServer((ipadress, 8000), app, handler_class=WebSocketHandler)
     server.serve_forever()
     GPIO.cleanup()

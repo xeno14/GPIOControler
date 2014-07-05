@@ -16,7 +16,9 @@
         </style>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
         <script type="text/javascript">
-            var ws = new WebSocket("ws://192.168.24.121:8000/echo");
+            var url = location.href;
+            var adress = url.match( /\/\/[^\/]+/ )[0].substr(2);    //アクセスしてきたアドレス (例 192.168.1.100:1234)
+            var ws = new WebSocket("ws://" + adress + "/echo");
             ws.onmessage = function(e) {
                 var log = (new Date()).toLocaleString() + "| " +  e.data;
                 $("#view").html(log + "\n" + $("#view").val());
