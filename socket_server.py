@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
@@ -21,9 +21,7 @@ wheel = WheelControler([7,11,13,15]) #車輪の制御プログラム
 th = SafetyThread(10)                #安全装置(10秒)    
 
 def app(env, start_response):
-    """
-    WebSocketのサーバ
-    """
+    """WebSocketのサーバ"""
     if env["PATH_INFO"] == '/echo':
         ws = env["wsgi.websocket"]
         while True:
