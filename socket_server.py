@@ -1,11 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-こぴぺ元
-http://d.hatena.ne.jp/hekyou/20120712/p1
-"""
-
 
 import sys
 import threading
@@ -14,20 +9,23 @@ import datetime
 import RPi.GPIO as GPIO
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
-from CAA import WheelControl
-from GPIOcontrol import SafetyThread
+from GPIOControler.GPIOControler import SafetyThread
+from WheelControler import WheelControler
 
 # index.htmlを開く
-f = open("./index.html");
+f = open("./html/index.html");
 content = f.read()
 f.close()
 
-wheel = WheelControl([7,11,13,15])  #車輪の制御プログラム
-th = SafetyThread(10)               #安全装置(10秒)    
+wheel = WheelControler([7,11,13,15]) #車輪の制御プログラム
+th = SafetyThread(10)                #安全装置(10秒)    
 
-def app(environ, start_response):
-    if environ["PATH_INFO"] == '/echo':
-        ws = environ["wsgi.websocket"]
+def app(env, start_response):
+    """
+    WebSocketのサーバ
+    """
+    if env["PATH_INFO"] == '/echo':
+        ws = env["wsgi.websocket"]
         while True:
             src = ws.receive()
             if src is None:
@@ -46,15 +44,19 @@ def app(environ, start_response):
         return iter([content])
 
 if __name__=="__main__":
-
-    if len(sys.argv) != 2:
-        print("usage: %s ipadress" % sys.argv[0])
+    if len(sys.argv) != 3:
+        print("usage: %s ipadress port" % sys.argv[0])
         sys.exit(1)
     ipadress = sys.argv[1]
+    port = int(sys.argv[2])
 
-    th.register(wheel.stop)
-    th.start()  #安全装置スレッドの開始
+    th.register(wheel.stop) #安全装置のコールバックの登録
+    th.start()              #安全装置スレッドの開始
 
-    server = pywsgi.WSGIServer((ipadress, 8000), app, handler_class=WebSocketHandler)
-    server.serve_forever()
-    GPIO.cleanup()
+    try:
+        server = pywsgi.WSGIServer((ipadress, port), app, handler_class=WebSocketHandler)
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print "detect KeyboardInterrupt. cleanup and exit."
+        GPIO.cleanup()
+        sys.exit(1)

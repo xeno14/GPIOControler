@@ -1,24 +1,19 @@
+#!/usr/bin/env python
+
 import RPi.GPIO as GPIO
 import time
-from CAA import WheelControl
-from GPIOcontrol import SafetyThread
-from GPIOcontrol import GPIOcontrol
+from GPIOControler.GPIOControler import GPIOControler
+from WheelControler import WheelControler
 
-w = WheelControl([7,11,13,15])
+w = WheelControler([7,11,13,15])
 
-safety = SafetyThread(3,1)
-def safe():
-    w.execute("brake")
-safety.register(safe)
-safety.start()
+if __name__ == '__main__':
+    w.execute("turn_left")
+    time.sleep(4)
 
-# w.execute("back")
+    print "back"
+    w.execute("back")
 
+    time.sleep(3)
 
-
-time.sleep(3)
-
-# w.execute("ccw")
-
-time.sleep(3)
-GPIOcontrol.cleanup()
+    GPIO.cleanup()

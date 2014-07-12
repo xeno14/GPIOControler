@@ -9,16 +9,17 @@ import RPi.GPIO as GPIO
 import threading
 import time
 
-
-class GPIOcontrol(object):
+class GPIOControler(object):
     """
     GPIOによってコントロールされるクラスのベースクラス．
     命令はstringで渡される．命令に対するコールバックを辞書に登録しておく．
     """
+    _last_order = ""        # 最後に実行した命令
+    _current_order = ""     # 現在処理中の命令
 
     def __init__(self, pins, mode=GPIO.BOARD):
         self._order_dict = {}
-        self.pins = pins[:]
+        self._pins = pins[:]
         GPIO.setmode(mode)
         for pin in pins:
             GPIO.setup(pin, GPIO.OUT)
@@ -33,12 +34,15 @@ class GPIOcontrol(object):
         
         @param order 命令(string)
         """
+        self._current_order = order
         do = self._order_dict[order]
 
         if args:
             do[0](**args)
         else:
             do[0](**do[1])
+        
+        self._last_order = order
 
     def register(self, order, func, args={}):
         """
@@ -46,35 +50,61 @@ class GPIOcontrol(object):
         """
         self._order_dict[order] = (func, args)
 
-    def setByBits(self, bits):
+    def set_by_bits(self, bits):
         """
         ビット列でオン，オフを制御する
 
         @param bits "1011"みたいな10でできた文字列
         """
-        numloop = min(len(bits), len(self.pins))
+        numloop = min(len(bits), len(self._pins))
         for i in range(numloop):
             if bits[i] is "1":
-                GPIO.output(self.pins[i], True)
+                GPIO.output(self._pins[i], True)
             else:
-                GPIO.output(self.pins[i], False)
+                GPIO.output(self._pins[i], False)
         # bitsの長さが足りなければFalseで埋める
-        if len(bits) < len(self.pins):
-            for i in range(len(bits),len(self.pins)):
-                GPIO.output(self.pins[i], False)
+        if len(bits) < len(self._pins):
+            for i in range(len(bits),len(self._pins)):
+                GPIO.output(self._pins[i], False)
+
+    def last_order(self):
+        """
+        最後に実行した命令の取得
+        """
+        return self._last_order
+
+    def current_order(self):
+        """
+        現在実行中の命令の取得
+        """
+        return self._current_order
+
+    def dump(self):
+        """
+        GPIOのピンの状態の出力．使用するピンの状態を調べ，Trueならoを，Falseなら
+        xを順次出力する．
+
+        例： [1,0,1,0] -> oxox
+        """
+        for pin in self._pins:
+            if GPIO.input(pin):
+                print "o",
+            else:
+                print "x",
+        print ""
+
 
 class SafetyThread(threading.Thread):
     """
     一定時間命令があるかどうかチェックする
-    TODO コールバック関数を登録するようにする
     """
     def __init__(self,threshold,tick=1):
         """
         コンストラクタ
 
-        @param threshold
-        時間の閾値(sec)．最後の時間の更新よりthreshold秒経ったらコールバックを呼ぶ．
-        @param tick スレッドのループの時間間隔
+        @param threshold 時間の閾値(sec)．\
+                最後の時間の更新よりthreshold秒経ったらコールバックを呼ぶ．
+        @param tick スレッドのループの時間間隔(sec)
         """
         threading.Thread.__init__(self)
         self._threshold = threshold
