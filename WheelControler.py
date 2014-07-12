@@ -18,14 +18,14 @@ class WheelControler(GPIOControler):
         """
         super(WheelControler,self).__init__(pins, mode)
 
-        self.register("forward",    self.forward)
-        self.register("back",       self.back)
-        self.register("brake",      self.brake)
-        self.register("stop",       self.stop)
-        self.register("cw",         self.cw)
-        self.register("ccw",        self.ccw)
-        self.register("left",  self.left)
-        self.register("right", self.right)
+        self.register("forward", self.forward)
+        self.register("back",    self.back)
+        self.register("brake",   self.brake)
+        self.register("stop",    self.stop)
+        self.register("cw",      self.cw)
+        self.register("ccw",     self.ccw)
+        self.register("left",    self.left)
+        self.register("right",   self.right)
 
     def execute(self, order):
         now = time.time()
@@ -71,7 +71,7 @@ class WheelControler(GPIOControler):
         """
         self.blink("1010","1000")   #右の車輪だけ状態が変わる
     
-    def blink(self,on_bits,off_bits="0000",interval=0.5):
+    def blink(self,on_bits,off_bits="0000",interval=0.1):
         """
         ピンの状態をinterval秒ごとにon，offの状態にする
 
@@ -86,6 +86,8 @@ class WheelControler(GPIOControler):
                 time.sleep(interval)
                 self.set_by_bits(off_bits)
                 time.sleep(interval)
+            # TODO ここで処理しないとoff_bitsになったままになることがある
+            self.execute("stop")
         t = threading.Thread(target = _blink)
         t.setDaemon(True)
         t.start()
