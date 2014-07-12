@@ -45,7 +45,7 @@ def app(env, start_response):
 
 if __name__=="__main__":
     if len(sys.argv) != 3:
-        print("usage: %s ipadress port" % sys.argv[0])
+        print("usage: %s servername port" % sys.argv[0])
         sys.exit(1)
     ipadress = sys.argv[1]
     port = int(sys.argv[2])
