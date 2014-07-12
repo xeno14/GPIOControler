@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -10,8 +10,7 @@ import threading
 import time
 
 class GPIOControler(object):
-    """
-    GPIOによってコントロールされるクラスのベースクラス．
+    """GPIOによってコントロールされるクラスのベースクラス．
     命令はstringで渡される．命令に対するコールバックを辞書に登録しておく．
     """
     _last_order = ""        # 最後に実行した命令
@@ -29,8 +28,7 @@ class GPIOControler(object):
         GPIO.cleanup()
 
     def execute(self, order, args={}):
-        """
-        命令(order)に従ってアクションを起こす
+        """命令(order)に従ってアクションを起こす
         
         @param order 命令(string)
         """
@@ -45,14 +43,11 @@ class GPIOControler(object):
         self._last_order = order
 
     def register(self, order, func, args={}):
-        """
-        命令に対するコールバックの登録
-        """
+        """命令に対するコールバックの登録"""
         self._order_dict[order] = (func, args)
 
     def set_by_bits(self, bits):
-        """
-        ビット列でオン，オフを制御する
+        """ビット列でオン，オフを制御する
 
         @param bits "1011"みたいな10でできた文字列
         """
@@ -68,20 +63,15 @@ class GPIOControler(object):
                 GPIO.output(self._pins[i], False)
 
     def last_order(self):
-        """
-        最後に実行した命令の取得
-        """
+        """最後に実行した命令の取得"""
         return self._last_order
 
     def current_order(self):
-        """
-        現在実行中の命令の取得
-        """
+        """現在実行中の命令の取得"""
         return self._current_order
 
     def dump(self):
-        """
-        GPIOのピンの状態の出力．使用するピンの状態を調べ，Trueならoを，Falseなら
+        """GPIOのピンの状態の出力．使用するピンの状態を調べ，Trueならoを，Falseなら
         xを順次出力する．
 
         例： [1,0,1,0] -> oxox
@@ -95,12 +85,9 @@ class GPIOControler(object):
 
 
 class SafetyThread(threading.Thread):
-    """
-    一定時間命令があるかどうかチェックする
-    """
+    """一定時間命令があるかどうかチェックする"""
     def __init__(self,threshold,tick=1):
-        """
-        コンストラクタ
+        """コンストラクタ
 
         @param threshold 時間の閾値(sec)．\
                 最後の時間の更新よりthreshold秒経ったらコールバックを呼ぶ．
@@ -114,9 +101,10 @@ class SafetyThread(threading.Thread):
         self.setDaemon(True)    #メインスレッドが死んだら私も死ぬ
 
     def run(self):
-        """スレッドの実行．tickごとにthresholdを超えないか確認し，超えた場合は
-        登録されたコールバック関数を呼ぶ.
-        """
+        """スレッドの実行．
+        
+        tickごとにthresholdを超えないか確認し，超えた場合は
+        登録されたコールバック関数を呼ぶ."""
         while(1):
             time.sleep(self._tick)
             now = time.time()
@@ -128,8 +116,7 @@ class SafetyThread(threading.Thread):
                 print "safety @",now
 
     def update(self):
-        """時間の更新
-        """
+        """時間の更新"""
         self._lasttime = time.time()
 
     def register(self, func):
