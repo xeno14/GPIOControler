@@ -1,41 +1,43 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import sys
-import threading
-import time
-import datetime
-import RPi.GPIO as GPIO
-from gevent import pywsgi
+from gevent import pywsgi, sleep
 from geventwebsocket.handler import WebSocketHandler
-from GPIOControler.GPIOControler import SafetyThread
-from WheelControler import WheelControler
 
 # index.htmlを開く
 f = open("./html/index.html");
 content = f.read()
 f.close()
 
-wheel = WheelControler([7,11,13,15]) #車輪の制御プログラム
-th = SafetyThread(10)                #安全装置(10秒)    
-
-def app(env, start_response):
-    """
-    WebSocketのサーバ
-    """
-    if env["PATH_INFO"] == '/echo':
-        ws = env["wsgi.websocket"]
-        while True:
-            src = ws.receive()
-            if src is None:
-                break
+ws_list = set()
+def chat_handle(environ, start_response):
+    global cnt
+    ws = environ['wsgi.websocket']
+    ws_list.add(ws)
+    print 'enter!', len(ws_list)
+    while 1:
+        msg = ws.receive()
+        if msg is None:
+            break
+        remove = set()
+        for s in ws_list:
             try:
-                wheel.execute(src)
-                th.update()
-                ws.send(src + "...done")
-            except:
-                ws.send(src + "...failed")
+                s.send(msg)
+            except Exception:
+                remove.add(s)
+        for s in remove:
+            ws_list.remove(s)
+    print 'exit!', len(ws_list)
+
+def app(environ, start_response):
+    """WebSocketのサーバ"""
+    path = environ["PATH_INFO"]
+    if path == '/echo':
+        return chat_handle(environ, start_response)
+    elif path == '/chatroom':   #deprecated
+        start_response("200 OK", [("Content-Type", "text/html")])  
+        return open('./html/chat_sample.html').read()
     else:
         start_response("200 OK", [
                 ("Content-Type", "text/html"),
@@ -50,13 +52,10 @@ if __name__=="__main__":
     ipadress = sys.argv[1]
     port = int(sys.argv[2])
 
-    th.register(wheel.stop) #安全装置のコールバックの登録
-    th.start()              #安全装置スレッドの開始
-
     try:
-        server = pywsgi.WSGIServer((ipadress, port), app, handler_class=WebSocketHandler)
+        server = pywsgi.WSGIServer((ipadress, port), app, \
+                handler_class=WebSocketHandler)
         server.serve_forever()
     except KeyboardInterrupt:
         print "detect KeyboardInterrupt. cleanup and exit."
-        GPIO.cleanup()
         sys.exit(1)
