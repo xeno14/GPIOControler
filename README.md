@@ -1,14 +1,16 @@
 GPIOControler
 =============
 
-# Usage
+## Usage
 
-  sudo ./socket_client.py [servername=localhost:5000]
+### using with websocket
 
-# Dependency
+    sudo ./socket_client.py [servername=localhost:5000]
 
-- [websocket-client](https://github.com/liris/websocket-clienthttps://github.com/liris/websocket-client)
+## Dependency
 
-# License
+- [websocket-client](https://github.com/liris/websocket-client)
+
+## License
 
 MIT
