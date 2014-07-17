@@ -120,5 +120,8 @@ class SafetyThread(threading.Thread):
         self._lasttime = time.time()
 
     def register(self, func):
-        """コールバック関数の登録．コールバック関数は引数なしにしてね．"""
+        """コールバック関数の登録
+        
+        @pre コールバック関数は引数をとらない
+        """
         self._callbacks.append(func)
