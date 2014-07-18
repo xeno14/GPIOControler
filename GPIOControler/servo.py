@@ -18,9 +18,11 @@ def initialize(pins=[], pwm=-1):
     subprocess.call("killall servod", shell=True)
     subprocess.call("servod" + args, shell=True)
 
+#childexception
     if pwm > 0:
         for i in range(len(pins)):
-            subprocess.call("echo %d=%d > /dev/servoblaster" % (i, pwm))
+            cmd = "echo %d=%d > /dev/servoblaster" % (i, pwm)
+            os.system(cmd)
 
 class ServoBlaster(object):
     """ServoBlasterのラッパー
@@ -58,8 +60,8 @@ class ServoBlaster(object):
                 * (self._pwm1 - self._pwm0)/(self._angle1 - self._angle0)\
                 + self._pwm0
         cmd = "echo %d=%d > /dev/servoblaster" % (self._no, pwm)
-        #os.system(cmd)
-        print "[%d] %s" % (angle, cmd)
+        os.system(cmd)
+        #print "[%d] %s" % (angle, cmd)
         self._angle = angle
 
     def move(self, angle):

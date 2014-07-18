@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 import time
 from GPIOControler.wheel import WheelControler
 from GPIOControler.servo import ServoBlaster
+import GPIOControler
 
 w = WheelControler([7,11,13,15])
 print("forward")
@@ -17,7 +18,8 @@ w.execute("brake")
 time.sleep(1)
 
 print "##### servo test #####"
-servo = ServoBlaster(7,0.05)
+GPIOControler.servo.initialize([12], 150)
+servo = ServoBlaster(0,0.05)
 # print "### 10 ###"
 # servo.move(10)
 # time.sleep(1)

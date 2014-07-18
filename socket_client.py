@@ -22,7 +22,7 @@ import subprocess
 GPIOControler.servo.initialize([12], 150)
 
 wh = WheelControler([7,11,13,15])   #車輪の制御
-sv = ServoBlaster(0, 0.1)           #サーボの制御
+sv = ServoBlaster(0, 0.075)           #サーボの制御
 th = SafetyThread(10)               #安全装置
 
 def handle_msg(msg):
