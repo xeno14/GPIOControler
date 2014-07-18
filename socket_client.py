@@ -4,17 +4,40 @@
 """socket_client 
 
 サーバーとWebSocketを使って通信を行い，送られてきた命令に従ってGPIOの制御をする．
+
+@TODO データはJsonで受け取る
 """
 
 import sys
 import RPi.GPIO as GPIO
-from GPIOControler.GPIOControler import SafetyThread
-from GPIOControler.WheelControler import Wheel
+from GPIOControler.safety import SafetyThread
+from GPIOControler.wheel import WheelControler
+from GPIOControler.servo import ServoBlaster
 import websocket
 import time
 
-wh = Wheel([7,11,13,15])
+wh = WheelControler([7,11,13,15])
+sv = ServoBlaster(7)
 th = SafetyThread(10)
+
+def handle_msg(msg):
+    """msgに従って命令を送るオブジェクトを変える
+    
+    いまはサーボとモータしかないので，適当
+    - サーボの命令
+        - servoXX XX=-60~60
+    - モータの命令
+        - forward
+        - back 
+        (以下略)
+    @todo Jsonの命令にする
+    """
+    if msg.startswith("servo"):
+        angle = int(msg[5:])
+        print angle
+        sv.execute(angle)
+    else:
+        wh.execute(msg)
 
 def on_message(ws, msg):
     """受信時のコールバック関数
@@ -25,7 +48,7 @@ def on_message(ws, msg):
     if msg.startswith(">") is False:
         try:
             print msg
-            wh.execute(msg)
+            handle_msg(msg)
             th.update()
             ws.send(">" + msg + " success")
         except:

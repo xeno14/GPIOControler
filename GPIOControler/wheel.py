@@ -3,17 +3,17 @@
 
 import time
 import threading
-from GPIOControler import GPIOControler
+from _controler import GPIOControler
 import RPi.GPIO as GPIO
 
-class Wheel(GPIOControler):
+class WheelControler(GPIOControler):
     """車輪の制御を行うクラス"""
 
     def __init__(self, pins, mode=GPIO.BOARD):
         """初期化
 
         @param pins 制御ピン．左から，1010で前進，0101で後退するように設定する．"""
-        super(Wheel,self).__init__(pins, mode)
+        super(WheelControler,self).__init__(pins, mode)
 
         self.register("forward", self.forward)
         self.register("back",    self.back)
@@ -29,8 +29,8 @@ class Wheel(GPIOControler):
         
         # 異なる制御をするときは間で一回止める
         if order != self.last_order():
-            super(Wheel,self).execute("stop")
-        super(Wheel,self).execute(order)
+            super(WheelControler,self).execute("stop")
+        super(WheelControler,self).execute(order)
 
     def forward(self):
         """前進，左輪，右輪ともに前進，"""
