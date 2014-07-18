@@ -9,10 +9,10 @@
 import sys
 import RPi.GPIO as GPIO
 from GPIOControler.GPIOControler import SafetyThread
-from WheelControler import WheelControler
+from GPIOControler.WheelControler import Wheel
 import websocket
 
-wh = WheelControler([7,11,13,15])
+wh = Wheel([7,11,13,15])
 th = SafetyThread(10)
 
 def on_message(ws, msg):
