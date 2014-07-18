@@ -16,13 +16,17 @@ print("brake")
 w.execute("brake")
 time.sleep(1)
 
-servo = ServoBlaster(7)
-servo.execute(10)
+print "##### servo test #####"
+servo = ServoBlaster(7,0.05)
+print "### 10 ###"
+servo.move(10)
 time.sleep(1)
-servo.execute(-10)
+print "### -10 ###"
+servo.move(-10)
+print "### 50 ###"
+servo.move(50)
 time.sleep(1)
-servo.execute(50)
-time.sleep(1)
-servo.execute(-50)
+print "### -50 ###"
+servo.move(-50)
 
 GPIO.cleanup()
