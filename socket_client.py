@@ -19,7 +19,7 @@ import time
 import subprocess
 
 #サーボの準備> 0 = p1pin12 = GPIO18
-GPIOControler.servo.initialize([12])
+GPIOControler.servo.initialize([12], 150)
 
 wh = WheelControler([7,11,13,15])   #車輪の制御
 sv = ServoBlaster(0, 0.1)           #サーボの制御

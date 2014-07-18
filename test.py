@@ -18,15 +18,16 @@ time.sleep(1)
 
 print "##### servo test #####"
 servo = ServoBlaster(7,0.05)
-print "### 10 ###"
-servo.move(10)
-time.sleep(1)
+# print "### 10 ###"
+# servo.move(10)
+# time.sleep(1)
 print "### -10 ###"
 servo.move(-10)
+time.sleep(1)
 print "### 50 ###"
 servo.move(50)
 time.sleep(1)
-print "### -50 ###"
-servo.move(-50)
+# print "### -50 ###"
+# servo.move(-50)
 
 GPIO.cleanup()
