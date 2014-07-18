@@ -34,9 +34,10 @@ def handle_msg(msg):
     """
     if msg.startswith("servo"):
         angle = int(msg[5:])
-        print angle
+        print "@servo", angle
         sv.execute(angle)
     else:
+        print "@wheel", msg
         wh.execute(msg)
 
 def on_message(ws, msg):
@@ -47,7 +48,6 @@ def on_message(ws, msg):
     """
     if msg.startswith(">") is False:
         try:
-            print msg
             handle_msg(msg)
             th.update()
             ws.send(">" + msg + " success")
