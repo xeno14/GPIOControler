@@ -10,14 +10,19 @@
 
 import sys
 import RPi.GPIO as GPIO
+import GPIOControler
 from GPIOControler.safety import SafetyThread
 from GPIOControler.wheel import WheelControler
 from GPIOControler.servo import ServoBlaster
 import websocket
 import time
+import subprocess
+
+#サーボの準備> 0 = p1pin12 = GPIO18
+GPIOControler.servo.initialize([12])
 
 wh = WheelControler([7,11,13,15])
-sv = ServoBlaster(7)
+sv = ServoBlaster(0)
 th = SafetyThread(10)
 
 def handle_msg(msg):
