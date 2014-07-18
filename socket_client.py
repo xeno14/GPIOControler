@@ -5,7 +5,7 @@
 
 サーバーとWebSocketを使って通信を行い，送られてきた命令に従ってGPIOの制御をする．
 
-@TODO データはJsonで受け取る
+@TODO プロトコルを真面目に考えろ
 """
 
 import sys
@@ -19,11 +19,11 @@ import time
 import subprocess
 
 #サーボの準備> 0 = p1pin12 = GPIO18
-GPIOControler.servo.initialize([12])
+GPIOControler.servo.initialize([12], 150)
 
-wh = WheelControler([7,11,13,15])
-sv = ServoBlaster(0)
-th = SafetyThread(10)
+wh = WheelControler([7,11,13,15])   #車輪の制御
+sv = ServoBlaster(0, 0.075)           #サーボの制御
+th = SafetyThread(10)               #安全装置
 
 def handle_msg(msg):
     """msgに従って命令を送るオブジェクトを変える
@@ -40,7 +40,7 @@ def handle_msg(msg):
     if msg.startswith("servo"):
         angle = int(msg[5:])
         print "@servo", angle
-        sv.execute(angle)
+        sv.move(angle)
     else:
         print "@wheel", msg
         wh.execute(msg)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         server_adress = sys.argv[1]
 
     # 安全装置の稼働
-    th.register(wh.stop)
+    th.register(wh.stop)    #車輪が勝手に止まるようにする
     th.start()
 
     websocket.enableTrace(True)

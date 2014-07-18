@@ -30,15 +30,16 @@ class GPIOControler(object):
         
         @param order 命令(string)
         """
-        self._current_order = order
-        do = self._order_dict[order]
-
-        if args:
-            do[0](**args)
+        if order in self._order_dict:
+            do = self._order_dict[order]
+            self._current_order = order
+            if args:
+                do[0](**args)
+            else:
+                do[0](**do[1])
+            self._last_order = order
         else:
-            do[0](**do[1])
-        
-        self._last_order = order
+            raise NotImplementedError
 
     def register(self, order, func, args={}):
         """命令に対するコールバックの登録"""
