@@ -3,6 +3,19 @@
 
 import subprocess
 
+def initialize(pins=[]):
+    """servodの初期化
+
+    既にプロセスがあったら殺す
+    @param pins --p1pins=で指定するピン（GPIOピンの番号）
+    @pre 管理者権限で実行されていること
+    """
+    args = ""
+    if len(pins) > 0:
+        args = " --p1pins=" + ",".join([str(i) for i in pins])
+    subprocess.call("killall servod", shell=True)
+    subprocess.call("servod" + args, shell=True)
+
 class ServoBlaster(object):
     """ServoBlasterのラッパー
 
