@@ -2,18 +2,16 @@
 
 import RPi.GPIO as GPIO
 import time
-from GPIOControler.GPIOControler import GPIOControler
-from WheelControler import WheelControler
+from GPIOControler.wheel import WheelControler
+from GPIOControler.servo import ServoBlaster
 
 w = WheelControler([7,11,13,15])
+servo = ServoBlaster(0)
 
-if __name__ == '__main__':
-    w.execute("turn_left")
-    time.sleep(4)
-
-    print "back"
-    w.execute("back")
-
-    time.sleep(3)
-
-    GPIO.cleanup()
+servo.execute(10)
+time.sleep(1)
+servo.execute(-10)
+time.sleep(1)
+servo.execute(50)
+time.sleep(1)
+servo.execute(-50)
