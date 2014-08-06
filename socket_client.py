@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     while True:
         try:
-            ws = websocket.WebSocketApp("ws://" + server_adress + "/echo",
+            ws = websocket.WebSocketApp("ws://" + server_adress,
                                         on_message=on_message,
                                         on_error=on_error,
                                         on_close=on_close)
