@@ -7,6 +7,7 @@ GPIOでコントロールするもの
 
 import RPi.GPIO as GPIO
 
+
 class GPIOControler(object):
     """GPIOによってコントロールされるクラスのベースクラス．
     命令はstringで渡される．命令に対するコールバックを辞書に登録しておく．
@@ -27,7 +28,7 @@ class GPIOControler(object):
 
     def execute(self, order, args={}):
         """命令(order)に従ってアクションを起こす
-        
+
         @param order 命令(string)
         """
         if order in self._order_dict:
@@ -58,7 +59,7 @@ class GPIOControler(object):
                 GPIO.output(self._pins[i], False)
         # bitsの長さが足りなければFalseで埋める
         if len(bits) < len(self._pins):
-            for i in range(len(bits),len(self._pins)):
+            for i in range(len(bits), len(self._pins)):
                 GPIO.output(self._pins[i], False)
 
     def last_order(self):
