@@ -3,7 +3,7 @@
 
 import time
 import threading
-from GPIOControler.GPIOControler import GPIOControler
+from _controler import GPIOControler
 import RPi.GPIO as GPIO
 
 class WheelControler(GPIOControler):
