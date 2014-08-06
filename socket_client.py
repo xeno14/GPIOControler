@@ -82,7 +82,7 @@ def on_open(ws):
     print "### open ###"
 
 if __name__ == "__main__":
-    server_adress = "localhost:5000"
+    server_adress = "localhost:5000/echo"
     if len(sys.argv) == 2:
         server_adress = sys.argv[1]
 
