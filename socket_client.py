@@ -9,13 +9,12 @@
 """
 
 import sys
-import RPi.GPIO as GPIO
 import GPIOControler
 from GPIOControler.safety import SafetyThread
 from GPIOControler.wheel import WheelControler
 from GPIOControler.servo import ServoBlaster
+import registry
 import websocket
-import time
 
 # サーボの準備> 0 = p1pin12 = GPIO18
 GPIOControler.servo.initialize([12], 150)
@@ -81,27 +80,18 @@ def on_open(ws):
     """
     print "### open ###"
 
-if __name__ == "__main__":
-    server_adress = "localhost:5000/echo"
-    if len(sys.argv) == 2:
-        server_adress = sys.argv[1]
 
+def get_websocket(server_address, index):
     # 安全装置の稼働
     th.register(wh.stop)
     th.start()
 
     websocket.enableTrace(True)
 
-    while True:
-        try:
-            ws = websocket.WebSocketApp("ws://" + server_adress,
-                                        on_message=on_message,
-                                        on_error=on_error,
-                                        on_close=on_close)
-            ws.on_open = on_open
-            ws.run_forever()
-            # 再接続の試行までのインターバル
-            time.sleep(1)
-        except KeyboardInterrupt:
-            GPIO.cleanup()
-            break
+    ws = websocket.WebSocketApp('ws://%s/robo/index' % (server_address, index),
+            on_message=on_message,
+            on_error=on_error,
+            on_close=on_close)
+    ws.on_open = on_open
+    return ws
+
