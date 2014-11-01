@@ -5,7 +5,6 @@
 
 サーバーとWebSocketを使って通信を行い，送られてきた命令に従ってGPIOの制御をする．
 
-@TODO プロトコルを真面目に考えろ
 """
 
 import sys
@@ -27,8 +26,8 @@ sv = ServoBlaster(0, 0.075)
 th = SafetyThread(10)
 
 
-def handle_msg(msg):
-    """msgに従って命令を送るオブジェクトを変える
+def handle_data(data):
+    """dataに従って命令を送るオブジェクトを変える
 
     いまはサーボとモータしかないので，適当
     - サーボの命令
@@ -37,30 +36,26 @@ def handle_msg(msg):
         - forward
         - back
         (以下略)
-    @todo Jsonの命令にする
     """
-    if msg.startswith("servo"):
-        angle = int(msg[5:])
-        print "@servo", angle
-        sv.move(angle)
-    else:
-        print "@wheel", msg
-        wh.execute(msg)
+    if data["type"] == "servo":
+        print "@servo", data["value"]
+        sv.move(data["value"])
+        return True
+    if data["type"] == "wheel":
+        print "@wheel", data["value"]
+        wh.execute(data["value"])
+        return True
+    return False
 
 
 def on_message(ws, msg):
     """受信時のコールバック関数
 
     受け取った命令に従って動作をする．動作が成功したかどうかを返事する．
-    返事は先頭に'>'をつけ，そのメッセージを自分が受信したときには何もしないようにする．
     """
-    if msg.startswith(">") is False:
-        try:
-            handle_msg(msg)
-            th.update()
-            ws.send(">" + msg + " success")
-        except:
-            ws.send(">" + msg + " fail")
+    data = json.loads(msg)
+    data['success'] = handle_data(data)
+    ws.send(json.dumps(data));
 
 
 def on_error(ws, error):
