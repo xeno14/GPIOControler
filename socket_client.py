@@ -13,6 +13,7 @@ from GPIOControler.safety import SafetyThread
 from GPIOControler.wheel import WheelControler
 from GPIOControler.servo import ServoBlaster
 import registry
+import json
 import websocket
 
 # サーボの準備> 0 = p1pin12 = GPIO18
@@ -76,14 +77,17 @@ def on_open(ws):
     print "### open ###"
 
 
-def get_websocket(server_address, index):
+def init_safety():
     # 安全装置の稼働
     th.register(wh.stop)
     th.start()
 
+
+def get_websocket(server_address, index):
+
     websocket.enableTrace(True)
 
-    ws = websocket.WebSocketApp('ws://%s/robo/index' % (server_address, index),
+    ws = websocket.WebSocketApp('ws://%s/robo/%s' % (server_address, index),
             on_message=on_message,
             on_error=on_error,
             on_close=on_close)

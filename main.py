@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
 
     registry.register(server_address, index)
+    socket_client.init_safety()
 
     while True:
         try:
