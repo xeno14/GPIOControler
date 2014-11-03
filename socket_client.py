@@ -15,6 +15,7 @@ from GPIOControler.servo import ServoBlaster
 import registry
 import json
 import websocket
+from python_say.voice_synthesis import say
 
 # サーボの準備> 0 = p1pin12 = GPIO18
 GPIOControler.servo.initialize([12], 150)
@@ -45,6 +46,10 @@ def handle_data(data):
     if data["type"] == "wheel":
         print "@wheel", data["value"]
         wh.execute(data["value"])
+        return True
+    if data["type"] == "say":
+        print "@say", data["value"]
+        say(data["value"])
         return True
     return False
 
