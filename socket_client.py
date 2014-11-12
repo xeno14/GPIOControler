@@ -5,17 +5,17 @@
 
 サーバーとWebSocketを使って通信を行い，送られてきた命令に従ってGPIOの制御をする．
 
-@TODO プロトコルを真面目に考えろ
 """
 
 import sys
-import RPi.GPIO as GPIO
 import GPIOControler
 from GPIOControler.safety import SafetyThread
 from GPIOControler.wheel import WheelControler
 from GPIOControler.servo import ServoBlaster
+import registry
+import json
 import websocket
-import time
+from python_say.voice_synthesis import say
 
 # サーボの準備> 0 = p1pin12 = GPIO18
 GPIOControler.servo.initialize([12], 150)
@@ -28,8 +28,8 @@ sv = ServoBlaster(0, 0.075)
 th = SafetyThread(10)
 
 
-def handle_msg(msg):
-    """msgに従って命令を送るオブジェクトを変える
+def handle_data(data):
+    """dataに従って命令を送るオブジェクトを変える
 
     いまはサーボとモータしかないので，適当
     - サーボの命令
@@ -38,30 +38,30 @@ def handle_msg(msg):
         - forward
         - back
         (以下略)
-    @todo Jsonの命令にする
     """
-    if msg.startswith("servo"):
-        angle = int(msg[5:])
-        print "@servo", angle
-        sv.move(angle)
-    else:
-        print "@wheel", msg
-        wh.execute(msg)
+    if data["type"] == "servo":
+        print "@servo", data["value"]
+        sv.move(data["value"])
+        return True
+    if data["type"] == "wheel":
+        print "@wheel", data["value"]
+        wh.execute(data["value"])
+        return True
+    if data["type"] == "say":
+        print "@say", data["value"]
+        say(data["value"])
+        return True
+    return False
 
 
 def on_message(ws, msg):
     """受信時のコールバック関数
 
     受け取った命令に従って動作をする．動作が成功したかどうかを返事する．
-    返事は先頭に'>'をつけ，そのメッセージを自分が受信したときには何もしないようにする．
     """
-    if msg.startswith(">") is False:
-        try:
-            handle_msg(msg)
-            th.update()
-            ws.send(">" + msg + " success")
-        except:
-            ws.send(">" + msg + " fail")
+    data = json.loads(msg)
+    data['success'] = handle_data(data)
+    ws.send(json.dumps(data));
 
 
 def on_error(ws, error):
@@ -81,27 +81,21 @@ def on_open(ws):
     """
     print "### open ###"
 
-if __name__ == "__main__":
-    server_adress = "localhost:5000/echo"
-    if len(sys.argv) == 2:
-        server_adress = sys.argv[1]
 
+def init_safety():
     # 安全装置の稼働
     th.register(wh.stop)
     th.start()
 
+
+def get_websocket(server_address, index):
+
     websocket.enableTrace(True)
 
-    while True:
-        try:
-            ws = websocket.WebSocketApp("ws://" + server_adress,
-                                        on_message=on_message,
-                                        on_error=on_error,
-                                        on_close=on_close)
-            ws.on_open = on_open
-            ws.run_forever()
-            # 再接続の試行までのインターバル
-            time.sleep(1)
-        except KeyboardInterrupt:
-            GPIO.cleanup()
-            break
+    ws = websocket.WebSocketApp('ws://%s/robo/%s' % (server_address, index),
+            on_message=on_message,
+            on_error=on_error,
+            on_close=on_close)
+    ws.on_open = on_open
+    return ws
+
